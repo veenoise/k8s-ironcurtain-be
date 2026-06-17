@@ -1,4 +1,4 @@
-# Operation: IronCurtain
+#  IronCurtain — Backend
 
 A story-driven, Cold War-themed Capture The Flag (CTF) backend built with FastAPI.
 
