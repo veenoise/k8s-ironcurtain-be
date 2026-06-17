@@ -1,0 +1,70 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-py"
+  binaryTargets = ["native"]
+}
+
+model User {
+  id           String       @id @default(uuid())
+  username     String       @unique
+  passwordHash String       @map("password_hash")
+  role         String       @default("user")
+  score        Int          @default(0)
+  createdAt    DateTime     @default(now()) @map("created_at")
+  submissions  Submission[]
+
+  @@map("users")
+}
+
+model Challenge {
+  id          String     @id @default(uuid())
+  name        String     @unique
+  codename    String
+  description String     @db.Text
+  storyOrder  Int        @unique @map("story_order")
+  questions   Question[]
+
+  @@map("challenges")
+}
+
+model Question {
+  id          String       @id @default(uuid())
+  title       String
+  prompt      String       @db.Text
+  points      Int
+  flagHash    String       @map("flag_hash")
+  challengeId String       @map("challenge_id")
+  challenge   Challenge    @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  submissions Submission[]
+  files       File[]
+
+  @@map("questions")
+}
+
+model File {
+  id         String   @id @default(uuid())
+  questionId String   @map("question_id")
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  fileName   String   @map("file_name")
+  filePath   String   @map("file_path")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@map("files")
+}
+
+model Submission {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  questionId  String   @map("question_id")
+  isCorrect   Boolean  @map("is_correct")
+  submittedAt DateTime @default(now()) @map("submitted_at")
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  question    Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@map("submissions")
+}
