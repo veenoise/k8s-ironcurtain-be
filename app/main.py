@@ -20,6 +20,7 @@ app = FastAPI(title="Operation: IronCurtain", lifespan=lifespan)
 origins = [
     "http://localhost:3000",      # React/Next.js local development
     "http://127.0.0.1:5173",      # Vite local development
+    "http://localhost:8080",      # Nginx Reverse Proxy if using dockerized frontend
 ]
 
 app.add_middleware(
