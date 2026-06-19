@@ -97,3 +97,15 @@ python seed/reset.py
 - **Submission** — `id`, `userId`, `questionId`, `isCorrect`, `submittedAt`
 
 Flags are stored as SHA-256 hashes. Plaintext flags are never stored in the database.
+
+## Docker build
+
+```bash
+docker build -t k8s-ironcurtain-be:latest .
+```
+
+## Docker compose
+
+```bash
+docker compose up -d
+```
