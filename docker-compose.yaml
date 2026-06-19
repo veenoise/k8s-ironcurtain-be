@@ -1,0 +1,14 @@
+services:
+  ironcurtain-be:
+    container_name: ironcurtain-be
+    image: k8s-ironcurtain-be:latest
+    ports:
+      - "8000:8000"
+    env_file:
+      - path: ".env"
+        required: true
+    volumes: 
+      - "ironcurtain-be-volume:/code/uploads"
+
+volumes:
+  ironcurtain-be-volume:
