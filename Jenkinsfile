@@ -2,8 +2,7 @@ pipeline {
     agent any
     
     environment {
-        APP_NAME = "ironcurtain-be"
-        HARBOR_PROJECT = "ironcurtain-be"
+        APP_NAME = "k8s-ironcurtain-be"
     }
     
     stages {
@@ -14,11 +13,11 @@ pipeline {
                     credentialsId: 'github_account'
             }
         }
-        stage('Login to Harbor') {
+        stage('Login to Quay') {
             steps {
-                withInfisical(configuration: [infisicalCredentialId: 'jenkins_universal_auth', infisicalEnvironmentSlug: 'dev', infisicalProjectSlug: 'global-harbor', infisicalUrl: 'https://infisical.sabihinmolang.eu.org'], infisicalSecrets: [infisicalSecret(includeImports: true, path: '/', secretValues: [[infisicalKey: 'HARBOR_EMAIL'], [infisicalKey: 'HARBOR_PASSWORD'], [infisicalKey: 'HARBOR_REGISTRY'], [infisicalKey: 'HARBOR_USERNAME']])]) {
+                withInfisical(configuration: [infisicalCredentialId: 'jenkins_universal_auth', infisicalEnvironmentSlug: 'dev', infisicalProjectSlug: 'global-quay', infisicalUrl: 'https://infisical.sabihinmolang.eu.org'], infisicalSecrets: [infisicalSecret(includeImports: true, path: '/', secretValues: [[infisicalKey: 'QUAY_PASSWORD'], [infisicalKey: 'QUAY_HOSTNAME'], [infisicalKey: 'QUAY_USERNAME']])]) {
                     sh '''
-                        docker login -u ${HARBOR_USERNAME} -p ${HARBOR_PASSWORD} ${HARBOR_REGISTRY}
+                        docker login -u ${QUAY_USERNAME} -p ${QUAY_PASSWORD} ${QUAY_HOSTNAME}
                     '''
                 }
             }
@@ -26,26 +25,25 @@ pipeline {
         stage('Build Docker') {
             steps {
                 sh '''
-                    docker build -t ${APP_NAME}:latest -t ${APP_NAME}:${BUILD_ID} .
+                    docker build -t ${APP_NAME}:latest .
                 '''
             }
         }
         stage('Tag to Harbor') {
             steps {
-                withInfisical(configuration: [infisicalCredentialId: 'jenkins_universal_auth', infisicalEnvironmentSlug: 'dev', infisicalProjectSlug: 'global-harbor', infisicalUrl: 'https://infisical.sabihinmolang.eu.org'], infisicalSecrets: [infisicalSecret(includeImports: true, path: '/', secretValues: [[infisicalKey: 'HARBOR_REGISTRY']])]) {
+                withInfisical(configuration: [infisicalCredentialId: 'jenkins_universal_auth', infisicalEnvironmentSlug: 'dev', infisicalProjectSlug: 'global-quay', infisicalUrl: 'https://infisical.sabihinmolang.eu.org'], infisicalSecrets: [infisicalSecret(includeImports: true, path: '/', secretValues: [[infisicalKey: 'QUAY_PASSWORD'], [infisicalKey: 'QUAY_HOSTNAME'], [infisicalKey: 'QUAY_USERNAME']])]) {
                     sh '''
-                        docker tag ${APP_NAME}:${BUILD_ID} ${HARBOR_REGISTRY}/${HARBOR_PROJECT}/${APP_NAME}:${BUILD_ID}
-                        docker tag ${APP_NAME}:latest ${HARBOR_REGISTRY}/${HARBOR_PROJECT}/${APP_NAME}:latest
+                        docker tag ${APP_NAME}:latest ${QUAY_HOSTNAME}/${QUAY_USERNAME}/${APP_NAME}:latest
                     '''
                 }
             }
         }
         stage('Push to Harbor') {
             steps {
-                withInfisical(configuration: [infisicalCredentialId: 'jenkins_universal_auth', infisicalEnvironmentSlug: 'dev', infisicalProjectSlug: 'global-harbor', infisicalUrl: 'https://infisical.sabihinmolang.eu.org'], infisicalSecrets: [infisicalSecret(includeImports: true, path: '/', secretValues: [[infisicalKey: 'HARBOR_REGISTRY']])]) {
+                withInfisical(configuration: [infisicalCredentialId: 'jenkins_universal_auth', infisicalEnvironmentSlug: 'dev', infisicalProjectSlug: 'global-quay', infisicalUrl: 'https://infisical.sabihinmolang.eu.org'], infisicalSecrets: [infisicalSecret(includeImports: true, path: '/', secretValues: [[infisicalKey: 'QUAY_PASSWORD'], [infisicalKey: 'QUAY_HOSTNAME'], [infisicalKey: 'QUAY_USERNAME']])]) {
                     sh '''
-                        docker push ${HARBOR_REGISTRY}/${HARBOR_PROJECT}/${APP_NAME}:${BUILD_ID}
-                        docker push ${HARBOR_REGISTRY}/${HARBOR_PROJECT}/${APP_NAME}:latest
+
+                        docker push ${QUAY_HOSTNAME}/${QUAY_USERNAME}/${APP_NAME}:latest
                     '''
                 }
             }
