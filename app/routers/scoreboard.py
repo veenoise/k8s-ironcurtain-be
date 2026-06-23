@@ -6,7 +6,7 @@ from app.schemas import ScoreboardEntry
 router = APIRouter(prefix="/api/v1/scoreboard", tags=["scoreboard"])
 
 
-@router.get("/", response_model=list[ScoreboardEntry])
+@router.get("", response_model=list[ScoreboardEntry])
 async def get_scoreboard():
     users = await db.user.find_many(
         order=[

@@ -27,7 +27,7 @@ def _file_response(f) -> QuestionFileResponse:
     )
 
 
-@router.get("/", response_model=list[ChallengeResponse])
+@router.get("", response_model=list[ChallengeResponse])
 async def list_challenges(user=Depends(get_current_user)):
     challenges = await db.challenge.find_many(
         include={"questions": {"include": {"files": True}}},
