@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from app.database import connect_db, disconnect_db
+from app.database import connect_db, disconnect_db, db
 from app.routers import admin, auth, challenges, scoreboard
 
 @asynccontextmanager
@@ -38,3 +38,12 @@ app.include_router(admin.router)
 app.include_router(auth.router)
 app.include_router(challenges.router)
 app.include_router(scoreboard.router)
+
+
+@app.get("/health")
+async def health_check():
+    try:
+        await db.query_raw("SELECT 1")
+    except Exception:
+        return {"status": "unhealthy", "database": "disconnected"}
+    return {"status": "ok"}
