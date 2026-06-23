@@ -15,7 +15,7 @@ async def lifespan(app: FastAPI):
     await disconnect_db()
 
 
-app = FastAPI(title="Operation: IronCurtain", lifespan=lifespan)
+app = FastAPI(title="IronCurtain", lifespan=lifespan, redoc_url=None, docs_url=None)
 
 origins = [
     "http://localhost:3000",                       # React/Next.js local development
