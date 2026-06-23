@@ -6,13 +6,6 @@ pipeline {
     }
     
     stages {
-        stage('Checkout Code') {
-            steps {
-                git url: 'https://github.com/veenoise/k8s-ironcurtain-be',
-                    branch: 'main',
-                    credentialsId: 'github_account'
-            }
-        }
         stage('Login to Quay') {
             steps {
                 withInfisical(configuration: [infisicalCredentialId: 'jenkins_universal_auth', infisicalEnvironmentSlug: 'dev', infisicalProjectSlug: 'global-quay', infisicalUrl: 'https://infisical.sabihinmolang.eu.org'], infisicalSecrets: [infisicalSecret(includeImports: true, path: '/', secretValues: [[infisicalKey: 'QUAY_PASSWORD'], [infisicalKey: 'QUAY_HOSTNAME'], [infisicalKey: 'QUAY_USERNAME']])]) {
