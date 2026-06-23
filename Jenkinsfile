@@ -6,6 +6,22 @@ pipeline {
     }
     
     stages {
+        stage('DB Migration') {
+            steps {
+                withInfisical(configuration: [infisicalCredentialId: 'jenkins_universal_auth', infisicalEnvironmentSlug: 'dev', infisicalProjectSlug: 'k8s-ironcurtain-be', infisicalUrl: 'https://infisical.sabihinmolang.eu.org'], infisicalSecrets: [infisicalSecret(includeImports: true, path: '/', secretValues: [[infisicalKey: 'DATABASE_URL']])]) {
+                    sh '''
+                        # 1. Create a fresh virtual environment in the workspace
+                        python3 -m venv .venv
+                        
+                        # 2. Install your dependencies (including prisma)
+                        ./.venv/bin/pip install -r requirements.txt
+                        
+                        # 3. Execute the Prisma migration deployment
+                        ./.venv/bin/python -m prisma migrate deploy
+                    '''
+                }
+            }
+        }
         stage('Login to Quay') {
             steps {
                 withInfisical(configuration: [infisicalCredentialId: 'jenkins_universal_auth', infisicalEnvironmentSlug: 'dev', infisicalProjectSlug: 'global-quay', infisicalUrl: 'https://infisical.sabihinmolang.eu.org'], infisicalSecrets: [infisicalSecret(includeImports: true, path: '/', secretValues: [[infisicalKey: 'QUAY_PASSWORD'], [infisicalKey: 'QUAY_HOSTNAME'], [infisicalKey: 'QUAY_USERNAME']])]) {
