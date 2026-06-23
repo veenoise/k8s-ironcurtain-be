@@ -66,7 +66,7 @@ python seed/reset.py
 
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
-| GET | `/` | Bearer | List challenges with questions and files |
+| GET | `—` | Bearer | List challenges with questions and files |
 | POST | `/submit` | Bearer | Submit a flag for a question |
 | GET | `/{qid}/files/{fid}/download` | Bearer | Download question file |
 
@@ -74,7 +74,7 @@ python seed/reset.py
 
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
-| GET | `/` | No | Top 100 users by score |
+| GET | `—` | No | Top 100 users by score |
 
 ### Admin (`/api/v1/admin`) — requires `role: admin`
 
